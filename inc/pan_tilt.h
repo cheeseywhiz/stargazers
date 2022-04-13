@@ -27,7 +27,9 @@ struct PanTilt{
 
 void pan_tilt_init(PanTilt * pan_tilt, Stepper * pan_stepper, Servo * tilt_servo, IMU * imu);
 
-void calibrate_pan_tilt(PanTilt * pan_tilt);
+void calculate_orientation(PanTilt * pan_tilt);
+
+void calibrate_pan_tilt(PanTilt * pan_tilt, uint8_t num_iterations);
 
 void write_pan_tilt(PanTilt * pan_tilt, int16_t altitude, int16_t azimuth, int16_t declination);
 

@@ -27,6 +27,7 @@ typedef struct Stepper Stepper;
 
 struct Stepper{
 	float angle;
+	float state_angle;
 	GPIO_TypeDef * step_port;
 	GPIO_TypeDef * dir_port;
 	uint16_t step_pin;

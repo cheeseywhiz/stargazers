@@ -19,9 +19,19 @@ void pan_tilt_init(PanTilt * pan_tilt, Stepper * pan_stepper, Servo * tilt_servo
 	pan_tilt->gamma = NAN;
 }
 
-void calibrate_pan_tilt(PanTilt * pan_tilt){
-	while(!euler_angle_success(pan_tilt->alpha, pan_tilt->beta, pan_tilt->gamma)){
-		printf("calibrating \n");
+void calculate_orientation(PanTilt * pan_tilt){
+
+	// reset euler angles
+	pan_tilt->alpha = NAN;
+	pan_tilt->beta = NAN;
+	pan_tilt->gamma = NAN;
+
+	// calculate euler angles
+	while(!euler_angle_success(pan_tilt->alpha, pan_tilt->beta, pan_tilt->gamma)) {
+
+		// print log
+		printf("$log (ijbd): calculating euler angles.\n");
+
 		// time average positions
 		Vector accel = {0,0,0};
 		Vector magnet = {0,0,0};
@@ -41,18 +51,26 @@ void calibrate_pan_tilt(PanTilt * pan_tilt){
 		normalize(&north);
 
 		// calculate euler angles
-
 		calculate_euler_angles(&north, &west, &up, &pan_tilt->alpha, &pan_tilt->beta, &pan_tilt->gamma);
+
 	}
 
-	// find stepper angle
-	Vector due_north = {1,0,0};
-	intrinsic_rotation(&due_north, pan_tilt->alpha, pan_tilt->beta, pan_tilt->gamma);
-	float phi, theta;
-	angles_from_vector(&due_north, &phi, &theta);
+	// reset stepper angle
+	pan_tilt->pan_stepper->angle = 0;
+}
 
-	float azimuth = _toggle_azimuth_theta(theta);
-	pan_tilt->pan_stepper->angle = stepper_mod(azimuth);
+void calibrate_pan_tilt(PanTilt * pan_tilt, uint8_t num_iterations){
+
+	for(uint8_t iter=0; iter < num_iterations; ++iter){
+		// print log
+		printf("$log (ijbd): calibrating (round %d of %d).\n", iter, num_iterations);
+
+		// get orientation
+		calculate_orientation(pan_tilt);
+
+		// move north
+		write_pan_tilt(pan_tilt, 0, 0, 0);
+	}
 }
 
 void write_pan_tilt(PanTilt * pan_tilt, int16_t altitude, int16_t azimuth, int16_t declination){
@@ -74,8 +92,6 @@ void write_pan_tilt(PanTilt * pan_tilt, int16_t altitude, int16_t azimuth, int16
 	float tilt_angle = rad2deg(_toggle_altitude_phi(phi));
 	float pan_angle = rad2deg(_toggle_azimuth_theta(theta));
 
-	printf("*%1.2f*\t",pan_tilt->pan_stepper->angle);
-	printf("(%1.2f, %1.2f)",tilt_angle,pan_angle);
 	// write motors
 	write_servo(pan_tilt->tilt_servo, tilt_angle);
 	write_stepper(pan_tilt->pan_stepper, pan_angle);

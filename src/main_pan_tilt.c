@@ -113,43 +113,11 @@ int main(void)
 
   pan_tilt_init(&pan_tilt, &pan_stepper, &tilt_servo, &tracker_imu);
 
-  run_tests();
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  printf("acc_x\t");
-  printf("acc_y\t");
-  printf("acc_z\t");
-  printf("mag_x\t");
-  printf("mag_y\t");
-  printf("mag_z\t");
-  printf("alpha\t");
-  printf("beta\t");
-  printf("gamma\t");
-  printf("phi\t");
-  printf("theta\n");
-
-  calibrate_pan_tilt(&pan_tilt);
-
-  printf("%.2f\t",pan_tilt.imu->accel.x);
-  printf("%.2f\t",pan_tilt.imu->accel.y);
-  printf("%.2f\t",pan_tilt.imu->accel.z);
-  printf("%.2f\t",pan_tilt.imu->magnet.x);
-  printf("%.2f\t",pan_tilt.imu->magnet.y);
-  printf("%.2f\t",pan_tilt.imu->magnet.z);
-  printf("%.2f\t",pan_tilt.alpha);
-  printf("%.2f\t",pan_tilt.beta);
-  printf("%.2f\t",pan_tilt.gamma);
-  printf("%.2f\t",rad2deg(pan_tilt.beta));
-  printf("%.2f\t",rad2deg(pan_tilt.alpha + pan_tilt.gamma));
-
-  write_pan_tilt(&pan_tilt,45, 45, 0);
-
-  printf("\n");
-
-
+  calibrate_pan_tilt(&pan_tilt, 5);
 
   while (1)
   {
