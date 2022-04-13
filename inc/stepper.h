@@ -18,8 +18,8 @@
 
 #include "stdlib.h"
 #include "stm32l4xx_hal.h"
-#define STEPPER_STEP_DELAY 10 // ms
-#define STEPPER_RES 1.8 // deg per stepper
+#define STEPPER_STEP_DELAY 10 // ms (easily meets setup/hold time)
+#define STEPPER_RES 1.8 // deg per step
 #define STEPPER_CW 0
 #define STEPPER_CCW 1
 
@@ -33,13 +33,15 @@ struct Stepper{
 	uint16_t dir_pin;
 };
 
+float stepper_mod(float angle);
+
 void stepper_init(Stepper * stepper_inst,
 					GPIO_TypeDef * step_port,
 					uint16_t step_pin,
 					GPIO_TypeDef * dir_port,
 					uint16_t dir_pin);
 
-void write_stepper(Stepper * stepper_inst, uint16_t angle);
+void write_stepper(Stepper * stepper_inst, float angle);
 
 void make_step(Stepper * stepper_inst, int direction);
 

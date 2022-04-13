@@ -6,6 +6,7 @@
  */
 
 #include "stepper.h"
+#include "math.h"
 
 void stepper_init(Stepper * stepper_inst,
 					GPIO_TypeDef * step_port,
@@ -20,11 +21,24 @@ void stepper_init(Stepper * stepper_inst,
 
 }
 
-void write_stepper(Stepper * stepper_inst, uint16_t angle){
-	int num_steps = abs(angle - stepper_inst->angle) / STEPPER_RES;
+float stepper_mod(float angle){
+	// convert to positive
+	angle = (angle < 0) ? fmod(angle,360) + 360 : angle;
+
+	// map to [0,360)
+	return fmod(angle, 360);
+}
+
+void write_stepper(Stepper * stepper_inst, float angle){
+	// convert to positive
+	angle = stepper_mod(angle);
+
+	// find number of steps
+	int num_steps = abs((angle - stepper_inst->angle)) / STEPPER_RES;
 	int dir = (angle > stepper_inst->angle) ? STEPPER_CW : STEPPER_CCW;
 
-	for(int step = 0; step < num_steps; ++step){
+	// carry out steps.
+	for(uint16_t step = 0; step < num_steps; ++step){
 		make_step(stepper_inst, dir);
 		stepper_inst->angle += (dir == STEPPER_CW) ? STEPPER_RES : -STEPPER_RES;
 	}

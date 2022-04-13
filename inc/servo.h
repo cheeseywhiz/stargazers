@@ -24,6 +24,7 @@
  *  pulse width freq = 1 / 7.4 us ~= 13.52 kHz
  *  psc = 4 MHz / 13.52 kHz - 1 ~= 29
  *  arr = 10 ms / 7.4 us - 1 ~= 1351
+ *  default pulse (compare) val = 158
  *
  *  MIN_COMPARE_VAL = 500 us / 7.4 us ~= 68
  *
@@ -41,7 +42,8 @@
 #define SERVO_PRESCALER 29
 #define SERVO_ARR 1351
 #define SERVO_MIN_COMPARE_VAL 68
-#define SERVO_ANGLE_LIM 90
+#define SERVO_ANGLE_MIN -45
+#define SERVO_ANGLE_MAX 75
 
 typedef struct Servo Servo;
 
@@ -51,13 +53,13 @@ struct Servo{
 
 void servo_init(Servo * servo_inst, TIM_HandleTypeDef * timer);
 
-void write_servo(Servo * servo_inst, uint8_t angle);
+void write_servo(Servo * servo_inst, int8_t angle);
 
 void _set_compare(TIM_HandleTypeDef * timer, uint16_t compare_val);
 
 void _attach_timer(Servo * servo_inst, TIM_HandleTypeDef * timer);
 
-uint16_t _get_compare_val(uint8_t angle);
+uint16_t _get_compare_val(int8_t angle);
 
 
 #endif /* INC_SERVO_H_ */
