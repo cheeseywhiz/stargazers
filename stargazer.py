@@ -7,10 +7,11 @@ import io
 import numpy as np
 import os
 import datetime
+from PIL import Image
 from skyfield.api import load
 from skyfield.api import N, E, wgs84
+import wmm2020
 from picamera import PiCamera
-from PIL import Image
 
 os.chdir('/home/pi/stargazers')
 
@@ -18,6 +19,11 @@ camera = PiCamera()
 camera.resolution = (480, 320)
 
 planets = load('de421.bsp')
+
+
+def pack_star_location(status: str, alt: float, azi: float, decl: float):
+    return struct.pack('<cfff', status, alt, azi, decl)
+
 
 def get_star_location(star: str, lat: float, lon: float, t: datetime.datetime):
     print(f'get star location: {star = } {lat = } {lon = } {t = }')
@@ -29,6 +35,12 @@ def get_star_location(star: str, lat: float, lon: float, t: datetime.datetime):
     astrometric = location.at(t).observe(star)
     alt, az, _ = astrometric.apparent().altaz()
     return alt.degrees, az.degrees
+
+
+def get_declination(lat: float, lon: float):
+    data = wmm2020.wmm([lat], [lon], 2022, 0)
+    declination = float(data.decl[0][0])
+    return declination
 
 
 def capture_image():
@@ -52,7 +64,7 @@ def chunks(arr, n):
 
 def gps_error(msg, ser):
     print(msg)
-    ser.write(struct.pack('<cff', 'V', 0, 0))
+    ser.write(pack_star_location('V', 0, 0, 0))
 
 
 def handle_requests():
@@ -99,7 +111,7 @@ def handle_requests():
             print(f'image transaction took {time1 - time0} s')
         elif request[0] == '$':
             # gps request
-            msg_id, utc_time, status, latitude, ns_indicator, longitude, ew_indicator, sog, cog,
+            msg_id, utc_time, status, latitude, ns_indicator, longitude, ew_indicator, sog, cog, \
                 date, magnetic_variation, mode, checksum, star = request.split(',')
             # NOTE: star field is added on Nucleo, not by gps chip
             print('gps:', request.split(','))
@@ -166,8 +178,9 @@ def handle_requests():
             datetime = datetime.datetime(year, month, day, hour, minute, second, millisecond * 1000,
                                          datetime.datetime.timezone.utc)
             alt, az = get_star_location(star, latitude, longitude, datetime)
-            print('computer calculated:', alt, az)
-            ser.write(struct.pack('<cff', status, alt, az))
+            print('calculated star location:', alt, az)
+            decl = get_declination(latitude, longitude)
+            ser.write(pack_star_location(status, alt, az, decl))
         else:
             print(f'log: {request}')
 

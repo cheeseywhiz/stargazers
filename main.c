@@ -131,6 +131,7 @@ struct star_location {
     char status; // 'A' for valid or 'V' for not valid
     float altitude;
     float azimuth;
+    float declination;
 };
 
 struct star_location get_star_location(const char *star) {
