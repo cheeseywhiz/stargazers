@@ -18,9 +18,9 @@ void servo_init(Servo * servo_inst, TIM_HandleTypeDef * timer){
 
 }
 
-void write_servo(Servo * servo_inst, uint8_t angle){
+void write_servo(Servo * servo_inst, int8_t angle){
 	// enforce angle constraint
-	angle = (angle > SERVO_ANGLE_LIM) ? SERVO_ANGLE_LIM : angle;
+	angle = (angle < SERVO_ANGLE_MIN) ? SERVO_ANGLE_MIN : (angle > SERVO_ANGLE_MAX) ? SERVO_ANGLE_MAX : angle;
 
 	// update servo compare register value
 	uint16_t compare_val = _get_compare_val(angle);
@@ -35,9 +35,9 @@ void _attach_timer(Servo * servo_inst, TIM_HandleTypeDef * timer){
 	servo_inst->timer = timer;
 }
 
-uint16_t _get_compare_val(uint8_t angle){
+uint16_t _get_compare_val(int8_t angle){
 
-	uint16_t compare_val = angle + (uint16_t)(SERVO_MIN_COMPARE_VAL);
+	uint16_t compare_val = 90 + angle + (uint16_t)(SERVO_MIN_COMPARE_VAL);
 
 	return compare_val;
 }
