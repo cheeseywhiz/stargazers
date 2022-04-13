@@ -59,64 +59,6 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN 0 */
 /***GPS Code***/
 static const int DATA_SIZE = 100;
-/*
-//uint8_t testData[DATA_SIZE];
-typedef struct {
-	int hour;
-	int min;
-	double sec;
-	double lat;
-	char NS;
-	double lon;
-	char EW;
-}gpsStruct;
-
-//struct list GPSInfo;
-
-int getGPSInfo(uint8_t info[DATA_SIZE], gpsStruct GPSInfo){
-	uint8_t comma = ',';
-	// Find $GPGGA first
-	int offsetIndex = 0;
-	while(info[offsetIndex] != '$' || info[offsetIndex + 1] != 'G' || info[offsetIndex + 2] != 'P' || info[offsetIndex + 3] != 'G' || info[offsetIndex + 4] != 'G' || info[offsetIndex + 5] != 'A'){
-		++offsetIndex;
-		if(offsetIndex >= DATA_SIZE - 45){
-			return -1;
-		}
-	}
-	// Get the time (first comma at index 6 last one at 17)
-	int indexTime = 7 + offsetIndex;
-	GPSInfo.hour = (int) info[indexTime];
-	GPSInfo.hour = GPSInfo.hour * 10;
-	GPSInfo.hour = GPSInfo.hour + ((int) info[indexTime + 1]);
-
-	GPSInfo.min = (int) info[indexTime + 2];
-	GPSInfo.min = GPSInfo.min * 10;
-	GPSInfo.min = GPSInfo.min + ((int) info[indexTime + 3]);
-
-	GPSInfo.sec = (10 * ((int) info[indexTime + 5])) + info[indexTime + 6] + (0.1 * ((int) info[indexTime + 7])) + (0.01 * ((int) info[indexTime + 8])) + (0.001 * ((int) info[indexTime + 9]));
-
-	// Get Latitude if available (first comma at index 17)
-	int iLat = 18 + offsetIndex;
-	// If GPS does not register any coordinates
-	if(info[iLat] == comma){
-		return -2;
-	}
-	GPSInfo.lat = (1000 * ((double) info[iLat])) + (100 * ((double) info[iLat+1])) + (10 * ((double) info[iLat+2])) + (double) info[iLat+3] + (0.1 * ((double) info[iLat+5])) + (0.01 * ((double) info[iLat+6])) + (0.001 * ((double) info[iLat+7])) + (0.0001 * ((double) info[iLat+8]));
-
-	// N/S Indicator
-	GPSInfo.NS = (char) info[iLat + 10];
-
-	// Longitude
-	int iLon = 30;
-	GPSInfo.lon = (1000 * ((double) info[iLon])) + (100 * ((double) info[iLon+1])) + (10 * ((double) info[iLon+2])) + (double) info[iLon+3] + (0.1 * ((double) info[iLon+5])) + (0.01 * ((double) info[iLon+6])) + (0.001 * ((double) info[iLon+7])) + (0.0001 * ((double) info[iLon+8]));
-
-	// E/W Indicator
-	GPSInfo.EW = (char) info[iLon+10];
-
-
-	return 0;
-}
-*/
 
 const char* getGPSString(uint8_t buffer[DATA_SIZE]) {
 	char *gps_string = (void*)buffer;
@@ -170,12 +112,16 @@ void uart_receive(void *buffer, size_t size) {
 }
 
 struct star_location {
+    char status; // 'A' for valid or 'V' for not valid
     float altitude;
     float azimuth;
 };
 
-struct star_location get_star_location(const char *star, float lat, float lon) {
-	printf("S %s %f %f\n", star, lat, lon);
+struct star_location get_star_location(const char *star) {
+	HAL_StatusTypeDef GPSStatus = HAL_UART_Receive(&huart3, (uint8_t*) gps_buffer, DATA_SIZE, 0xFFFF);
+	const char *gps_string = getGPSString(gps_buffer);
+    printf("%s,%s\n", gps_string, star);
+
     struct star_location location;
     uart_receive((void*)&location, sizeof(location));
     return location;
@@ -229,18 +175,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	HAL_StatusTypeDef GPSStatus = HAL_UART_Receive(&huart3, (uint8_t*) gps_buffer, 100, 5000);
-	const char *gps_string = getGPSString(gps_buffer);
-	printf("%s\n", gps_string);
-//	for(int i = 0; i < 100; ++i){
-//		testDataDisplay[i] = testData[i];
-//	}
-//	getGPSInfo(testData, GPSInfo);
-
-	// TODO: change get_star_location to send the gps string with the star name appended to the end (with a comma ofc)
-
 	for (int i = 0; i < 10; i++) {
-		struct star_location location = get_star_location("mars", 42.3583, -71.0636);
+		struct star_location location = get_star_location("mars");
 		printf("mars location: alt: %f \tazi: %f\n", location.altitude, location.azimuth);
 		int x = 0;
 	}
