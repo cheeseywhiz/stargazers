@@ -58,22 +58,38 @@ static void MX_USART3_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /***GPS Code***/
-static const int DATA_SIZE = 100;
+static const int GPS_BUFFER_SIZE = 100;
+uint8_t gps_buffer[GPS_BUFFER_SIZE];
 
-const char* getGPSString(uint8_t buffer[DATA_SIZE]) {
-	char *gps_string = (void*)buffer;
-	while(gps_string[0] != '$') {
-		gps_string++;
-	}
-	// now gps_string starts with $
-	uint16_t length = 0;
-	while (gps_string[length] != '\n') {
-		length++;
-	}
-	// now length points to \n
-	// overwrite CRLF with NL
-	gps_string[length - 1] = '\0';
-	return gps_string;
+void getGPSString() {
+    const char *const rmc_prefix = "$GPRMC";
+    int i = 0;
+
+    // while matching, increase i
+    // if not matching, reset i to 0
+    while (i < strlen(rmc_prefix)) {
+        HAL_UART_Receive(&huart3, (void*)(&gps_buffer[i]), sizeof(char), 0xFFFF);
+
+        if (gps_buffer[i] == rmc_prefix[i]) {
+            i++;
+        } else {
+            i = 0;
+        }
+    }
+
+    // read up to next CR
+    while (1) {
+        HAL_UART_Receive(&huart3, (void*)(&gps_buffer[i]), sizeof(char), 0xFFFF);
+
+        if (gps_buffer[i] == '\r') {
+            break;
+        } else {
+            i++;
+        }
+    }
+
+    // i now points to CR, so overwrite it with NL.
+    gps_buffer[i] = '\0';
 }
 /***End of GPS Code***/
 
@@ -118,9 +134,8 @@ struct star_location {
 };
 
 struct star_location get_star_location(const char *star) {
-	HAL_StatusTypeDef GPSStatus = HAL_UART_Receive(&huart3, (uint8_t*) gps_buffer, DATA_SIZE, 0xFFFF);
-	const char *gps_string = getGPSString(gps_buffer);
-    printf("%s,%s\n", gps_string, star);
+	getGPSString(gps_buffer);
+    printf("%s,%s\n", gps_buffer, star);
 
     struct star_location location;
     uart_receive((void*)&location, sizeof(location));
@@ -164,8 +179,6 @@ int main(void)
   MX_LPUART1_UART_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t gps_buffer[DATA_SIZE];
-  //gpsStruct GPSInfo;
   /* USER CODE END 2 */
 
   /* Infinite loop */
