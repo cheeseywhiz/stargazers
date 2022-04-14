@@ -20,6 +20,10 @@ camera.resolution = (480, 320)
 
 planets = load('de421.bsp')
 
+# initial time to be set by very first star request
+t0 = None
+TIME_SCALE_FACTOR = 5
+
 
 def pack_star_location(status: str, alt: float, azi: float, decl: float):
     return struct.pack('<cfff', status, alt, azi, decl)
@@ -175,9 +179,15 @@ def handle_requests():
                 gps_error(f'malformed {date=}', ser)
                 continue
 
-            datetime = datetime.datetime(year, month, day, hour, minute, second, millisecond * 1000,
-                                         datetime.datetime.timezone.utc)
-            alt, az = get_star_location(star, latitude, longitude, datetime)
+            t1 = datetime.datetime(year, month, day, hour, minute, second, millisecond * 1000,
+                                   datetime.timezone.utc)
+            # set initial time
+            nonlocal t0
+            if t0 is None:
+                t0 = t1
+            # accelerate time
+            t1 = (t1 - t0) * TIME_SCALE_FACTOR + t0
+            alt, az = get_star_location(star, latitude, longitude, t1)
             print('calculated star location:', alt, az)
             decl = get_declination(latitude, longitude)
             ser.write(pack_star_location(status, alt, az, decl))
