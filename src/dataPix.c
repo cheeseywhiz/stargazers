@@ -390,25 +390,45 @@ void buildDisplay(char *str1, char *str2, char *str3, char *str4, char *str5, ch
   printRect(100, 430, 140, 470, squareColor);
   printRect(180, 430, 220, 470, squareColor);*/
   //printRect(10, 20, 40, 50, squareColor);
-  // Print Words
+  
   uint16_t xWordOffset = 50;
-  printWord(xWordOffset, 20, str1, textColor, bgColor, 1);
-  printWord(xWordOffset, 90, str2, textColor, bgColor, 1);
-  printWord(xWordOffset, 160, str3, textColor, bgColor, 1);
-  printWord(xWordOffset, 230, str4, textColor, bgColor, 1);
-  printWord(xWordOffset, 300, str5, textColor, bgColor, 1);
-  printWord(xWordOffset, 370, str6, textColor, bgColor, 1);
-  // Print Numbers
-  printWord(xWordOffset/2, 20, "1:", textColor, bgColor, 1);
-  printWord(xWordOffset/2, 90, "2:", textColor, bgColor, 1);
-  printWord(xWordOffset/2, 160, "3:", textColor, bgColor, 1);
-  printWord(xWordOffset/2, 230, "4:", textColor, bgColor, 1);
-  printWord(xWordOffset/2, 300, "5:", textColor, bgColor, 1);
-  printWord(xWordOffset/2, 370, "6:", textColor, bgColor, 1);
+  // Print Planet List
+  if (scroll == 0) {
+	  printWord(xWordOffset, 20, "1: Mercury", textColor, bgColor, 1);
+	  printWord(xWordOffset, 90, "2: Venus", textColor, bgColor, 1);
+	  printWord(xWordOffset, 160, "3: Moon", textColor, bgColor, 1);
+	  printWord(xWordOffset, 230, "4: Mars", textColor, bgColor, 1);
+	  printWord(xWordOffset, 300, "5: Jupiter", textColor, bgColor, 1);
+	  printWord(xWordOffset, 370, "6: Saturn", textColor, bgColor, 1);
+  }
+  else if (scroll = 1) {
+	  printWord(xWordOffset, 20, "2: Venus", textColor, bgColor, 1);
+	  printWord(xWordOffset, 90, "3: Moon", textColor, bgColor, 1);
+	  printWord(xWordOffset, 160, "4: Mars", textColor, bgColor, 1);
+	  printWord(xWordOffset, 230, "5: Jupiter", textColor, bgColor, 1);
+	  printWord(xWordOffset, 300, "6: Saturn", textColor, bgColor, 1);
+	  printWord(xWordOffset, 370, "7: Uranus", textColor, bgColor, 1);
+  }
+  else if (scroll = 2) {
+  	  printWord(xWordOffset, 20, "3: Moon", textColor, bgColor, 1);
+  	  printWord(xWordOffset, 90, "4: Mars", textColor, bgColor, 1);
+  	  printWord(xWordOffset, 160, "5: Jupiter", textColor, bgColor, 1);
+  	  printWord(xWordOffset, 230, "6: Saturn", textColor, bgColor, 1);
+  	  printWord(xWordOffset, 300, "7: Uranus", textColor, bgColor, 1);
+  	  printWord(xWordOffset, 370, "8: Neptune", textColor, bgColor, 1);
+  }
+  else {
+	  printWord(xWordOffset, 20, "4: Mars", textColor, bgColor, 1);
+	  printWord(xWordOffset, 90, "5: Jupiter", textColor, bgColor, 1);
+	  printWord(xWordOffset, 160, "6: Saturn", textColor, bgColor, 1);
+	  printWord(xWordOffset, 230, "7: Uranus", textColor, bgColor, 1);
+	  printWord(xWordOffset, 300, "8: Neptune", textColor, bgColor, 1);
+	  printWord(xWordOffset, 370, "9: Pluto", textColor, bgColor, 1);
+  }
 
-  char *up = "UP A";
-  char *down = "DOWN B";
-  char *enter = "ENTER C";
+  char *up = "A: UP";
+  char *down = "B: DOWN";
+  char *enter = "C: PHOTO";
   printWord(10, 450, up, textColor, bgColor, 1);
   printWord(102, 450, down, textColor, bgColor, 1);
   printWord(215, 450, enter, textColor, bgColor, 1);
