@@ -148,7 +148,7 @@ void printChar(uint16_t x, uint16_t y, unsigned char c, uint16_t color, uint16_t
 
 void printWord(uint16_t x, uint16_t y, char *str, uint16_t color, uint16_t bg, uint16_t sizeStr);
 
-void buildDisplay(char *str1, char *str2, char *str3, char *str4, char *str5, char *str6);
+void buildDisplay(int scroll);
 
 int upPressed();
 
