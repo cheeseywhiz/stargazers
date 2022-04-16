@@ -18,7 +18,7 @@
 
 #include "stdlib.h"
 #include "stm32l4xx_hal.h"
-#define STEPPER_STEP_DELAY 10 // ms (easily meets setup/hold time)
+#define STEPPER_STEP_DELAY 25 // ms (easily meets setup/hold time)
 #define STEPPER_RES 1.8 // deg per step
 #define STEPPER_CW 0
 #define STEPPER_CCW 1

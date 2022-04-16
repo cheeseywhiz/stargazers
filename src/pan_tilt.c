@@ -63,7 +63,7 @@ void calibrate_pan_tilt(PanTilt * pan_tilt, uint8_t num_iterations){
 
 	for(uint8_t iter=0; iter < num_iterations; ++iter){
 		// print log
-		printf("$log (ijbd): calibrating (round %d of %d).\n", iter, num_iterations);
+		printf("$log (ijbd): calibrating (round %d of %d).\n", iter+1, num_iterations);
 
 		// get orientation
 		calculate_orientation(pan_tilt);
@@ -74,9 +74,6 @@ void calibrate_pan_tilt(PanTilt * pan_tilt, uint8_t num_iterations){
 }
 
 void write_pan_tilt(PanTilt * pan_tilt, int16_t altitude, int16_t azimuth, int16_t declination){
-	// read imu and calculate euler numbers
-	read_imu(pan_tilt->imu);
-
 	// get desired vector
 	Vector star;
 	vector_from_angles(&star, _toggle_altitude_phi(deg2rad(altitude)), _toggle_azimuth_theta(deg2rad(azimuth-declination)));
@@ -92,9 +89,9 @@ void write_pan_tilt(PanTilt * pan_tilt, int16_t altitude, int16_t azimuth, int16
 	float tilt_angle = rad2deg(_toggle_altitude_phi(phi));
 	float pan_angle = rad2deg(_toggle_azimuth_theta(theta));
 
-	// write motors
-	write_servo(pan_tilt->tilt_servo, tilt_angle);
+	// write motors in order
 	write_stepper(pan_tilt->pan_stepper, pan_angle);
+	write_servo(pan_tilt->tilt_servo, tilt_angle);
 
 }
 
