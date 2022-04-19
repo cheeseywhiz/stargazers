@@ -21,8 +21,8 @@
  *	assuming one compare bit per degree...
  *
  *  pulse width resolution = (2500 us - 500 us) / 270 deg = 7.4 us
- *  pulse width freq = 1 / 7.4 us ~= 13.52 kHz
- *  psc = 4 MHz / 13.52 kHz - 1 ~= 29
+ *  pulse width freq = 1 / 7.4 us ~= 135.2 kHz
+ *  psc = 70 MHz / 135.2 kHz - 1 ~= 517
  *  arr = 10 ms / 7.4 us - 1 ~= 1351
  *  default pulse (compare) val = 158
  *
@@ -39,10 +39,10 @@
 #include "stdlib.h"
 
 #define SERVO_TIM_CHANNEL TIM_CHANNEL_3
-#define SERVO_PRESCALER 29
+#define SERVO_PRESCALER 517
 #define SERVO_ARR 1351
 #define SERVO_MIN_COMPARE_VAL 68
-#define SERVO_ANGLE_MIN -45
+#define SERVO_ANGLE_MIN -20
 #define SERVO_ANGLE_MAX 75
 
 typedef struct Servo Servo;

@@ -31,4 +31,9 @@
 #define R4_PORT GPIOB
 #define R4_PIN GPIO_PIN_10
 
+int readKeypad();
+
+void loadKeypadInterrupt();
+void clearKeypadInterrupt();
+
 #endif /* INC_KEYPAD_H_ */

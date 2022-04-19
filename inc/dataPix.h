@@ -106,8 +106,8 @@ extern SPI_HandleTypeDef hspi1;
 
 #define DC_PORT GPIOC
 #define CS_PORT GPIOC
-#define DC_PIN GPIO_PIN_0
-#define CS_PIN GPIO_PIN_3
+#define DC_PIN GPIO_PIN_5
+#define CS_PIN GPIO_PIN_4
 #define RST_PORT GPIOA
 #define RST_PIN GPIO_PIN_3
 
@@ -115,7 +115,6 @@ extern SPI_HandleTypeDef hspi1;
 #define HEIGHT 480
 /*
 void select();
-
 void unselect();*/
 
 void reset();
@@ -156,13 +155,9 @@ int downPressed();
 
 /*
 void ADC_SELECT_XM();
-
 void ADC_SELECT_XP();
-
 void ADC_SELECT_YP();
-
 void ADC_SELECT_YM();
-
 void getPoint(int *x, int *y, int *z);*/
 
 
@@ -171,15 +166,12 @@ void getPoint(int *x, int *y, int *z);*/
 // Global Vars
 /*
 uint8_t rotation;
-
 uint16_t textColor;
 uint16_t lineColor;
 uint16_t squareColor;
 uint16_t bgColor;
-
 uint8_t current_width;
 uint8_t current_height;
-
 int CurrentSelection;*/
 
 
