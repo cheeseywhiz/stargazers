@@ -109,7 +109,6 @@ static const uint8_t
 void select(){
     HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_RESET);
 }
-
 void unselect()
 {
     HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_SET);
@@ -364,7 +363,7 @@ void printWord(uint16_t x, uint16_t y, char *str, uint16_t color, uint16_t bg, u
 	} // for i
 }
 
-void buildDisplay(char *str1, char *str2, char *str3, char *str4, char *str5, char *str6){
+void buildDisplay(int scroll){
 	uint16_t textColor = HX8357_WHITE;
 	uint16_t lineColor = HX8357_YELLOW;
 	uint16_t squareColor = HX8357_WHITE;
@@ -390,7 +389,7 @@ void buildDisplay(char *str1, char *str2, char *str3, char *str4, char *str5, ch
   printRect(100, 430, 140, 470, squareColor);
   printRect(180, 430, 220, 470, squareColor);*/
   //printRect(10, 20, 40, 50, squareColor);
-  
+
   uint16_t xWordOffset = 50;
   // Print Planet List
   if (scroll == 0) {
@@ -401,7 +400,7 @@ void buildDisplay(char *str1, char *str2, char *str3, char *str4, char *str5, ch
 	  printWord(xWordOffset, 300, "5: Jupiter", textColor, bgColor, 1);
 	  printWord(xWordOffset, 370, "6: Saturn", textColor, bgColor, 1);
   }
-  else if (scroll = 1) {
+  else if (scroll == 1) {
 	  printWord(xWordOffset, 20, "2: Venus", textColor, bgColor, 1);
 	  printWord(xWordOffset, 90, "3: Moon", textColor, bgColor, 1);
 	  printWord(xWordOffset, 160, "4: Mars", textColor, bgColor, 1);
@@ -409,7 +408,7 @@ void buildDisplay(char *str1, char *str2, char *str3, char *str4, char *str5, ch
 	  printWord(xWordOffset, 300, "6: Saturn", textColor, bgColor, 1);
 	  printWord(xWordOffset, 370, "7: Uranus", textColor, bgColor, 1);
   }
-  else if (scroll = 2) {
+  else if (scroll == 2) {
   	  printWord(xWordOffset, 20, "3: Moon", textColor, bgColor, 1);
   	  printWord(xWordOffset, 90, "4: Mars", textColor, bgColor, 1);
   	  printWord(xWordOffset, 160, "5: Jupiter", textColor, bgColor, 1);
@@ -426,9 +425,9 @@ void buildDisplay(char *str1, char *str2, char *str3, char *str4, char *str5, ch
 	  printWord(xWordOffset, 370, "9: Pluto", textColor, bgColor, 1);
   }
 
-  char *up = "A: UP";
-  char *down = "B: DOWN";
-  char *enter = "C: PHOTO";
+  char *up = "A:UP";
+  char *down = "B:DOWN";
+  char *enter = "C:PHOTO";
   printWord(10, 450, up, textColor, bgColor, 1);
   printWord(102, 450, down, textColor, bgColor, 1);
   printWord(215, 450, enter, textColor, bgColor, 1);
@@ -450,7 +449,6 @@ int upPressed(){
   printRect(10, 20 + 70*(CurrentSelection - 1), 40, 50 + 70*(CurrentSelection - 1), squareColor);
   return 0;
 }
-
 // Return 1 to go to a new display up
 // Return 0 to go down
 int downPressed(){
@@ -466,6 +464,7 @@ int downPressed(){
 }*/
 
 void loadingScreen(char *star){
+	gfxFont = &mono9x7;
 	fillScreen(HX8357_WHITE);
 	printWord(50, 200, "Loading: ", HX8357_BLACK, HX8357_WHITE, 1);
 	printWord(50, 250, star, HX8357_BLACK, HX8357_WHITE, 1);
@@ -527,32 +526,25 @@ void ADC_SELECT_XM(){
 	sConfig.Channel = ADC_CHANNEL_1;
 	sConfig.Rank = 1;
 }
-
 void ADC_SELECT_XP(){
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_3;
 	sConfig.Rank = 1;
 }
-
 void ADC_SELECT_YP(){
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_2;
 	sConfig.Rank = 1;
 }
-
 void ADC_SELECT_YM(){
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_4;
 	sConfig.Rank = 1;
-
 }
-
 void getPoint(int *x, int *y, int *z){
 	int samples[2]; // NUMSAMPLES
 	uint8_t i, valid;
-
 	valid = 1;
-
 	/*
 	#define XM_PORT GPIOC
 	#define XM_PIN GPIO_PIN_0
@@ -562,7 +554,6 @@ void getPoint(int *x, int *y, int *z){
 	#define YM_PIN GPIO_PIN_3
 	#define YP_PORT GPIOC
 	#define YP_PIN GPIO_PIN_1
-
 	//GPIOC
 	uint32_t *gpioc = 0x48000800;
 	uint32_t testTemp = *gpioc;
@@ -586,8 +577,6 @@ void getPoint(int *x, int *y, int *z){
 		samples[0] = (samples[0] + samples[1]) >> 1;
 	}
 	*x = 1023 - samples[0];
-
-
 	// Switch x's to input
 	*gpioc = (*gpioc) & 0xFFFFFFCC;
 	// Switch y's to output
@@ -607,8 +596,6 @@ void getPoint(int *x, int *y, int *z){
 		samples[0] = (samples[0] + samples[1]) >> 1;
 	}
 	*y = 1023 - samples[0];
-
-
 	// Switch xp to output
 	*gpioc = (*gpioc) | 0x30;
 	// Switch yp to input
@@ -631,35 +618,28 @@ void getPoint(int *x, int *y, int *z){
 	rtouch *=
 	rtouch *= _
 	*z = 1024 - (z2 - z1);
-
-
 }*/
 
 /*
 void printChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor){
-
   setAddrWindow(x, y, font.width-1, font.height-1);
-
   for(uint32_t i = 0; i < font.height; i++){
     uint32_t b = font.data[(ch - 32) * font.height + i];
     for(uint32_t j = 0; j < font.height; j++){
       if((b << j) & 0x8000){
     	  writeData16(&color, 2);
       }
-
       else{
     	  writeData16(&bgcolor, 2);
       }
     } // for j
   } // for i
-
 }*/
 
 
 
 /*
 void printWord(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor){
-
   while(*str){
     if(x + font.width >= HX8357_TFTWIDTH){
       x = 0;
@@ -667,18 +647,14 @@ void printWord(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t c
       if(y + font.height >= HX8357_TFTHEIGHT){
         break;
       }
-
       if(*str == ' '){
         // skip
         ++str;
         continue;
       }
     } // if x + font.width >= max width
-
     printChar(x, y, *str, font, color, bgcolor);
     x += font.width;
     ++str;
   } // while(*str)
-
 }*/
-

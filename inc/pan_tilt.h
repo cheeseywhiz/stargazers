@@ -12,7 +12,7 @@
 #include "stepper.h"
 #include "imu.h"
 
-#define NUM_SAMPLES_FOR_AVERAGE 200
+#define NUM_SAMPLES_FOR_AVERAGE 500
 
 typedef struct PanTilt PanTilt;
 

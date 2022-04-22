@@ -33,7 +33,7 @@ void _write_reg_i2c_lsm303(I2C_HandleTypeDef * hi2c, uint8_t dev_addr, uint8_t s
 
 	if ( ret != HAL_OK ) {
 	  ret = 1;
-	  printf("$log (ijbd): failed I2C.\n");
+	  //printf("log (ijbd): failed I2C.\n");
 	}
 }
 
@@ -44,7 +44,7 @@ void _read_i2c_lsm303(I2C_HandleTypeDef * hi2c, uint8_t dev_addr, uint8_t sub_ad
 
 	if ( ret != HAL_OK ) {
 	  ret = 1;
-	  printf("$log (ijbd): failed I2C.\n");
+	  //printf("log (ijbd): failed I2C.\n");
 	}
 
 	// read from address
@@ -52,7 +52,7 @@ void _read_i2c_lsm303(I2C_HandleTypeDef * hi2c, uint8_t dev_addr, uint8_t sub_ad
 
 	if ( ret != HAL_OK ) {
 	  ret = 1;
-	  printf("$log (ijbd): failed I2C.\n");
+	  //printf("log (ijbd): failed I2C.\n");
 	}
 }
 
