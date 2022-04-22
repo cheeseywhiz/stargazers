@@ -17,7 +17,7 @@
 		- RX:  10
 	- nucleo TX -> rpi RX
 	- nucleo RX <- rpi TX
-	- nucleo CTS A6 <- rpi RTS
+	- nucleo CTS B13 <- rpi RTS
 	- nucleo RTS B1 -> rpi CTS
 * GPS
 	* Go to USART# (will be using USART3 in general for this instruction)
