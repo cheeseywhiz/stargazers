@@ -6,7 +6,7 @@
 	- baud: 115200
 	- word length: 8 bits
 	- nucleo pins
-		- CTS: A6
+		- CTS: B13
 		- RTS: B1
 		- RX:  C0
 		- TX:  C1
