@@ -10,7 +10,6 @@ import datetime
 from PIL import Image
 from skyfield.api import load
 from skyfield.api import N, E, wgs84
-import wmm2020
 from picamera import PiCamera
 
 os.chdir('/home/pi/stargazers')
@@ -42,9 +41,7 @@ def get_star_location(star: str, lat: float, lon: float, t: datetime.datetime):
 
 
 def get_declination(lat: float, lon: float):
-    data = wmm2020.wmm([lat], [lon], 2022, 0)
-    declination = float(data.decl[0][0])
-    return declination
+    return 6.0 # Ann Arbor and surrounding area
 
 
 def capture_image():
@@ -84,24 +81,11 @@ def handle_requests():
 
         print(request)
         request = request.decode()[:-1] # remove trailing whitespace
-
-        if request[0] == 'S':
-            _, star, lat, lon, *extra = request.split()
-
-            if extra:
-                print('extra S args:', *extra)
-                continue
-
-            try:
-                lat, lon = float(lat), float(lon)
-            except ValueError:
-                print('malformed args:', lat, lon)
-                continue
-
-            alt, az = get_star_location(star, lat, lon)
-            #print('computer calculated:', alt, az)
-            ser.write(struct.pack('<ff', alt, az))
-        elif request[0] == 'P':
+        while (request[0] != 'P' and request[0] != '$'):
+            request = ser.readline()
+            request = request.decode()[:-1] # remove trailing whitespace
+        
+        if request[0] == 'P':
             # take picture
             arr = capture_image()
             time0 = time.perf_counter()
