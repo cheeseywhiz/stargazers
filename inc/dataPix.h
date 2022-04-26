@@ -113,9 +113,6 @@ extern SPI_HandleTypeDef hspi1;
 
 #define WIDTH 320
 #define HEIGHT 480
-/*
-void select();
-void unselect();*/
 
 void reset();
 
@@ -152,27 +149,6 @@ void buildDisplay(int scroll);
 int upPressed();
 
 int downPressed();
-
-/*
-void ADC_SELECT_XM();
-void ADC_SELECT_XP();
-void ADC_SELECT_YP();
-void ADC_SELECT_YM();
-void getPoint(int *x, int *y, int *z);*/
-
-
-//void printWord(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor);
-
-// Global Vars
-/*
-uint8_t rotation;
-uint16_t textColor;
-uint16_t lineColor;
-uint16_t squareColor;
-uint16_t bgColor;
-uint8_t current_width;
-uint8_t current_height;
-int CurrentSelection;*/
 
 
 #endif /* INC_DATAPIX_H_ */
