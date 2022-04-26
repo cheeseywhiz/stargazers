@@ -82,6 +82,7 @@ def handle_requests():
         print(request)
         request = request.decode()[:-1] # remove trailing whitespace
         while (request[0] != 'P' and request[0] != '$'):
+            print(f'log: {request}')
             request = ser.readline()
             request = request.decode()[:-1] # remove trailing whitespace
         
@@ -97,7 +98,7 @@ def handle_requests():
 
             time1 = time.perf_counter()
             print(f'image transaction took {time1 - time0} s')
-        elif request[0] == '$':
+        else:
             # gps request
             msg_id, utc_time, status, latitude, ns_indicator, longitude, ew_indicator, sog, cog, \
                 date, magnetic_variation, mode, checksum, star = request.split(',')
@@ -175,8 +176,6 @@ def handle_requests():
             print('calculated star location:', alt, az)
             decl = get_declination(latitude, longitude)
             ser.write(pack_star_location(status, alt, az, decl))
-        else:
-            print(f'log: {request}')
 
 
 if __name__ == '__main__':
