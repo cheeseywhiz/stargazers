@@ -28,7 +28,6 @@
 #include "stepper.h"
 #include "imu.h"
 #include "pan_tilt.h"
-#include "unit_test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -82,7 +81,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t pin) {
 
 
 // ---------------------------------------------Begin GPS Code---------------------------------------------
-/***GPS Code***/
 #define GPS_BUFFER_SIZE 100
 uint8_t gps_buffer[GPS_BUFFER_SIZE];
 
@@ -142,18 +140,8 @@ void uart_receive(void *buffer, size_t size) {
 		HAL_UART_Receive(&hlpuart1, buffer, transfer_size, 0xffff);
 		buffer = (void*)((uintptr_t)buffer + transfer_size);
 		transferred += transfer_size;
-		/*
-		struct pixel *pixels = (struct pixel*)buffer;
-		struct pixel pixel0 = pixels[0];
-		struct pixel pixel1 = pixels[1];
-		struct pixel pixel2 = pixels[2];
-		int z = 0;
-		*/
 	}
 }
-
-#define min(x,y) (((x) < (y)) ? (x) : (y))
-#define max(x,y) (((x) > (y)) ? (x) : (y))
 
 struct star_location {
 	char status; // 'A' for valid, 'V' for invalid
@@ -263,8 +251,6 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
-
-
   pix_initialize();
 
   // wait press
@@ -311,13 +297,13 @@ int main(void)
 	  			capturePicture();
 	  			while(readKeypad() == -1){ }
 	  			buildDisplay(add);
-	  		} // scroll page up
+	  		} // scroll page up only if not already at top
 	  		else if (choice == 10 && add != 0) {
-	  			add = max(0, add - 1);
+	  			add = add - 1;
 	  			buildDisplay(add);
-	  		} // scroll page down
+	  		} // scroll page down only if not already at bottom
 	  		else if (choice == 11 && add != 3) {
-	  			add = min(3, add + 1);
+	  			add = add + 1;
 	  			buildDisplay(add);
 	  		}
 	  		// else do absolutely nothing
