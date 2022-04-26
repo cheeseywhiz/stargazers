@@ -105,14 +105,7 @@ static const uint8_t
     HX8357_DISPON, 0x80 +  50/5, // Main screen turn on, delay 50 ms
     0,                           // END OF COMMAND LIST
   };
-/*
-void select(){
-    HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_RESET);
-}
-void unselect()
-{
-    HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_SET);
-}*/
+
 
 void reset(){
     HAL_GPIO_WritePin(RST_PORT, RST_PIN, GPIO_PIN_RESET);
@@ -178,14 +171,7 @@ void pix_initialize(){
         }
     }
 
-    //unselect();
     setRotation(0);
-    //_width  = HX8357_TFTWIDTH;  // Screen dimensions for default rotation 0
-    //_height = HX8357_TFTHEIGHT;
-//    textColor = HX8357_WHITE;
-//    lineColor = HX8357_YELLOW;
-//    squareColor = HX8357_WHITE;
-//    bgColor = HX8357_BLACK;
 }// initialize
 
 void setRotation(uint8_t m){
@@ -194,30 +180,20 @@ void setRotation(uint8_t m){
     switch(rotation) {
     case 0:
       m       = MADCTL_MX | MADCTL_MY | MADCTL_RGB;
-      //current_width  = HX8357_TFTWIDTH;
-      //current_height = HX8357_TFTHEIGHT;
       break;
     case 1:
       m       = MADCTL_MV | MADCTL_MY | MADCTL_RGB;
-      //current_width  = HX8357_TFTHEIGHT;
-      //current_height = HX8357_TFTWIDTH;
       break;
     case 2:
       m       = MADCTL_RGB;
-      //current_width  = HX8357_TFTWIDTH;
-      //current_height = HX8357_TFTHEIGHT;
       break;
     case 3:
       m       = MADCTL_MX | MADCTL_MV | MADCTL_RGB;
-      //current_width  = HX8357_TFTHEIGHT;
-      //current_height = HX8357_TFTWIDTH;
       break;
     }
 
-    //select();
     writeCmd(HX8357_MADCTL);
     writeData(&m, 1);
-    //unselect();
 
 }// setRotation
 
@@ -234,12 +210,8 @@ void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h){
 }
 
 void drawPixel(uint16_t x0, uint16_t y0, uint16_t color){
-    //select();
-
     setAddrWindow(x0, y0, 1, 1);
     writeData16(&color, 2);
-
-    //unselect();
 }
 
 // Return color
@@ -354,10 +326,6 @@ void printWord(uint16_t x, uint16_t y, char *str, uint16_t color, uint16_t bg, u
 	int i = 0;
 	while(*str != '\0'){
 		printChar(x + i*15, y, *str, color, bg, 1);
-		/*
-		if(i % 5 == 4){
-			y += 15;
-		}*/
 		++i;
 		++str;
 	} // for i
@@ -384,11 +352,6 @@ void buildDisplay(int scroll){
   // Lines (vertical at bottom)
   printRect(90, 420, 92, 480, lineColor);
   printRect(205, 420, 203, 480, lineColor);
-  // Squares
-  /*
-  printRect(100, 430, 140, 470, squareColor);
-  printRect(180, 430, 220, 470, squareColor);*/
-  //printRect(10, 20, 40, 50, squareColor);
 
   uint16_t xWordOffset = 50;
   // Print Planet List
@@ -431,37 +394,7 @@ void buildDisplay(int scroll){
   printWord(10, 450, up, textColor, bgColor, 1);
   printWord(102, 450, down, textColor, bgColor, 1);
   printWord(215, 450, enter, textColor, bgColor, 1);
-
-  //CurrentSelection = 1;
 }
-
-// Return 1 to go to a new display up
-// Return 0 to go up
-/*
-int upPressed(){
-  if(CurrentSelection == 1){
-    return 1;
-  }
-  // Fill in old square
-  printRect(10, 20 + 70*(CurrentSelection - 1), 40, 50 + 70*(CurrentSelection - 1), bgColor);
-  --CurrentSelection;
-  // Place new square
-  printRect(10, 20 + 70*(CurrentSelection - 1), 40, 50 + 70*(CurrentSelection - 1), squareColor);
-  return 0;
-}
-// Return 1 to go to a new display up
-// Return 0 to go down
-int downPressed(){
-  if(CurrentSelection == 6){
-    return 1;
-  }
-  // Fill in old square
-  printRect(10, 20 + 70*(CurrentSelection - 1), 40, 50 + 70*(CurrentSelection - 1), bgColor);
-  ++CurrentSelection;
-  // Place new square
-  printRect(10, 20 + 70*(CurrentSelection - 1), 40, 50 + 70*(CurrentSelection - 1), squareColor);
-  return 0;
-}*/
 
 void loadingScreen(char *star){
 	gfxFont = &mono9x7;
@@ -469,192 +402,3 @@ void loadingScreen(char *star){
 	printWord(50, 200, "Loading: ", HX8357_BLACK, HX8357_WHITE, 1);
 	printWord(50, 250, star, HX8357_BLACK, HX8357_WHITE, 1);
 }
-/*
-void calibration(uint16_t image[], uint16_t *x, uint16_t *y){
-  // Create image
-  for(int i = 0; i < 320; ++i){
-    for(int j = 0; j < 480; ++j){
-      drawPixel(i, j, image[i][j]);
-    }
-  }
-  int cal = -1;
-  drawPixel(*x, *y, HX8357_RED);
-  while(1){
-    cal = readKeypad();
-    if(cal == 12){
-      break;
-    }
-    switch(cal){
-      case 2:
-        if(*y > 0){
-          drawPixel(*x, *y, image[*x][*y]);
-          *y = (*y) - 1;
-          drawPixel = (*x, *y, HX8357_RED);
-        }
-        break;
-      case 4:
-        if(*x > 0){
-          drawPixel(*x, *y, image[*x][*y]);
-          *x = (*x) - 1;
-          drawPixel = (*x, *y, HX8357_RED);
-        }
-        break;
-      case 5:
-        if(*x < 320){
-          drawPixel(*x, *y, image[*x][*y]);
-          *y = (*y) + 1;
-          drawPixel = (*x, *y, HX8357_RED);
-        }
-        break;
-      case 6:
-        if(*y < 480){
-          drawPixel(*x, *y, image[*x][*y]);
-          *x = (*x) + 1;
-          drawPixel = (*x, *y, HX8357_RED);
-        }
-        break;
-      default:
-        cal = -1;
-        break;
-    }
-  }
-}*/
-
-/*
-void ADC_SELECT_XM(){
-	ADC_ChannelConfTypeDef sConfig = {0};
-	sConfig.Channel = ADC_CHANNEL_1;
-	sConfig.Rank = 1;
-}
-void ADC_SELECT_XP(){
-	ADC_ChannelConfTypeDef sConfig = {0};
-	sConfig.Channel = ADC_CHANNEL_3;
-	sConfig.Rank = 1;
-}
-void ADC_SELECT_YP(){
-	ADC_ChannelConfTypeDef sConfig = {0};
-	sConfig.Channel = ADC_CHANNEL_2;
-	sConfig.Rank = 1;
-}
-void ADC_SELECT_YM(){
-	ADC_ChannelConfTypeDef sConfig = {0};
-	sConfig.Channel = ADC_CHANNEL_4;
-	sConfig.Rank = 1;
-}
-void getPoint(int *x, int *y, int *z){
-	int samples[2]; // NUMSAMPLES
-	uint8_t i, valid;
-	valid = 1;
-	/*
-	#define XM_PORT GPIOC
-	#define XM_PIN GPIO_PIN_0
-	#define XP_PORT GPIOC
-	#define XP_PIN GPIO_PIN_2
-	#define YM_PORT GPIOC
-	#define YM_PIN GPIO_PIN_3
-	#define YP_PORT GPIOC
-	#define YP_PIN GPIO_PIN_1
-	//GPIOC
-	uint32_t *gpioc = 0x48000800;
-	uint32_t testTemp = *gpioc;
-	// Switch y's to input
-	*gpioc = (*gpioc) & 0xFFFFFF33;
-	// Switch x's to outputs
-	*gpioc = (*gpioc) | 0x33;
-	// Set xp high and xm low
-	HAL_GPIO_WritePin(XM_PORT, XM_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(XP_PORT, XP_PIN, GPIO_PIN_SET);
-	ADC_SELECT_YP();
-	for(i = 0; i < 2; ++i){ // NUMSAMPLES
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-		samples[i] = HAL_ADC_GetValue(&hadc1);
-	}
-	if(samples[0] - samples[1] < -4 || samples[0] - samples[1] > 4){
-		valid = 0;
-	}
-	else{
-		samples[0] = (samples[0] + samples[1]) >> 1;
-	}
-	*x = 1023 - samples[0];
-	// Switch x's to input
-	*gpioc = (*gpioc) & 0xFFFFFFCC;
-	// Switch y's to output
-	*gpioc = (*gpioc) | 0x00CC;
-	HAL_GPIO_WritePin(YM_PORT, YM_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(YP_PORT, YP_PIN, GPIO_PIN_SET);
-	ADC_SELECT_XM();
-	for(i = 0; i < 2; ++i){ // NUMSAMPLES
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-		samples[i] = HAL_ADC_GetValue(&hadc1);
-	}
-	if(samples[0] - samples[1] < -4 || samples[0] - samples[1] > 4){
-		valid = 0;
-	}
-	else{
-		samples[0] = (samples[0] + samples[1]) >> 1;
-	}
-	*y = 1023 - samples[0];
-	// Switch xp to output
-	*gpioc = (*gpioc) | 0x30;
-	// Switch yp to input
-	*gpioc = (*gpioc) & 0xFFFFFFC0;
-	HAL_GPIO_WritePin(XP_PORT, XP_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(YM_PORT, YM_PIN, GPIO_PIN_SET);
-	ADC_SELECT_XM();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	int z1 = HAL_ADC_GetValue(&hadc1);
-	ADC_SELECT_YP();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	int z2 = HAL_ADC_GetValue(&hadc1);
-	/*
-	float rtouch;
-	rtouch = z2;
-	rtouch /= z1;
-	rtouch -= 1;
-	rtouch *=
-	rtouch *= _
-	*z = 1024 - (z2 - z1);
-}*/
-
-/*
-void printChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor){
-  setAddrWindow(x, y, font.width-1, font.height-1);
-  for(uint32_t i = 0; i < font.height; i++){
-    uint32_t b = font.data[(ch - 32) * font.height + i];
-    for(uint32_t j = 0; j < font.height; j++){
-      if((b << j) & 0x8000){
-    	  writeData16(&color, 2);
-      }
-      else{
-    	  writeData16(&bgcolor, 2);
-      }
-    } // for j
-  } // for i
-}*/
-
-
-
-/*
-void printWord(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor){
-  while(*str){
-    if(x + font.width >= HX8357_TFTWIDTH){
-      x = 0;
-      y += font.height;
-      if(y + font.height >= HX8357_TFTHEIGHT){
-        break;
-      }
-      if(*str == ' '){
-        // skip
-        ++str;
-        continue;
-      }
-    } // if x + font.width >= max width
-    printChar(x, y, *str, font, color, bgcolor);
-    x += font.width;
-    ++str;
-  } // while(*str)
-}*/
